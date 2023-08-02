@@ -63,12 +63,12 @@
             <action onclick="put(5)">5</action>
             <action onclick="put(6)">6</action>
             <action onclick="put('-')">-</action>
-            <action onclick="put(Math.PI)" class="hidden">Pi</action>
+            <action onclick="put('Math.PI')" class="hidden">Pi</action>
             <action onclick="put(1)">1</action>
             <action onclick="put(2)">2</action>
             <action onclick="put(3)">3</action>
             <action onclick="put('+')">+</action>
-            <action onclick="put(Math.E)" class="hidden">e</action>
+            <action onclick="put('Math.E')" class="hidden">e</action>
             <action onclick="__toggle()">T</action>
             <action onclick="put(0)">0</action>
             <action onclick="put('.')">.</action>
@@ -111,6 +111,10 @@
         }
         function put(num,opt){
             if(num!=null){
+                if(['Math.PI','Math.E'].includes(_eval_string[_input_place-1])){
+                    _eval_string.splice(_input_place,0,'*');
+                    _input_place++;
+                }
                 _eval_string.splice(_input_place,0,num);
                 _input_place++;
             }else{
@@ -132,12 +136,14 @@
             if(force){
                 _tx.textContent = force;
             }else{
-                let _tmp_string = Array.from(_eval_string);
-                _tmp_string.splice(_input_place,0,"|");
-                _tx.textContent = _tmp_string.join("");
+                let _tmp_string = _eval_string.toSpliced(_input_place,0,"|").join("");
+                _tx.textContent = _tmp_string
+                                .replace(/Math\.E/g,"e")
+                                .replace(/Math\.PI/g,"π");
             }
         }
         function __eval(){
+            let _calc_string = Array.from(_eval_string);
             let _result = eval(_eval_string.join(""));
             _eval_string = [_result];
             _input_place = 1;
