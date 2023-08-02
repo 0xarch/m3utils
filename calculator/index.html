@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://0xarch.github.io/mata-toolkit/mata-css/mata.css">
+    <script src="https://0xarch.github.io/mata-toolkit/mata-js/mata.js"></script>
+    <title>计算器</title>
+</head>
+<body>
+    <style>
+        #M3_MAIN{
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #M3_LABEL{
+            flex:1;
+        }
+        #M3_INPUT{
+            display: grid;
+            flex:1;
+        }
+        #M3_CONTROL{
+            display: flex;
+            flex:.2;
+        }
+        #M3_CONTROL>*{
+            flex:1;
+        }
+        tx{
+            font-size: xx-large;
+        }
+    </style>
+    <div id="M3_MAIN">
+        <div id="M3_LABEL">
+            <tx></tx>
+        </div>
+        <div id="M3_INPUT">
+            <action class="hidden">2nd</action>
+            <action class="hidden">deg</action>
+            <action class="hidden">sin</action>
+            <action class="hidden">cos</action>
+            <action class="hidden">tan</action>
+            <action class="hidden">x^y</action>
+            <action class="hidden">lg</action>
+            <action class="hidden">ln</action>
+            <action onclick="put('(')" class="hidden">(</action>
+            <action onclick="put(')')" class="hidden">)</action>
+            <action class="hidden">sqrt</action>
+            <action onclick="put(null,1)">C</action>
+            <action onclick="put(null,0)">&lt;=</action>
+            <action onclick="put('%')">%</action>
+            <action onclick="put('/')">/</action>
+            <action class="hidden">x!</action>
+            <action onclick="put(7)">7</action>
+            <action onclick="put(8)">8</action>
+            <action onclick="put(9)">9</action>
+            <action onclick="put('*')">*</action>
+            <action class="hidden">1/x</action>
+            <action onclick="put(4)">4</action>
+            <action onclick="put(5)">5</action>
+            <action onclick="put(6)">6</action>
+            <action onclick="put('-')">-</action>
+            <action onclick="put(Math.PI)" class="hidden">Pi</action>
+            <action onclick="put(1)">1</action>
+            <action onclick="put(2)">2</action>
+            <action onclick="put(3)">3</action>
+            <action onclick="put('+')">+</action>
+            <action onclick="put(Math.E)" class="hidden">e</action>
+            <action onclick="__toggle()">T</action>
+            <action onclick="put(0)">0</action>
+            <action onclick="put('.')">.</action>
+            <action onclick="__eval()">=</action>
+        </div>
+        <div id="M3_CONTROL">
+            <action onclick="__move(0)">&lt;</action>
+            <action onclick="__move(1)">&gt;</action>
+        </div>
+    </div>
+    <script>
+        let _eval_string = [];
+        let _input_place = 0;
+        let _is_easy_mode = false; // will be set to true then
+        let _adv_elements = document.querySelectorAll(".hidden");
+        let _m3_grid = document.getElementById("M3_INPUT");
+        let _tx = document.querySelector("tx");
+        function __toggle(){
+            if(_is_easy_mode){ // turn to advanced mode
+                _adv_elements.forEach(item=>{
+                    item.style.display="flex";
+                })
+                _m3_grid.style.grid="auto-flow dense / repeat(5,1fr)";
+                _is_easy_mode=false;
+            }else{ // turn to easy mode
+                _adv_elements.forEach(item=>{
+                    item.style.display="none";
+                })
+                _m3_grid.style.grid="auto-flow dense / repeat(4,1fr)";
+                _is_easy_mode=true;
+            }
+        }
+        function __move(dct){
+            if(dct==0){ // left is 0
+                _input_place==0?_input_place:_input_place--;
+            }else{ // right is 1
+                if(_input_place<_eval_string.length)_input_place++;
+            }
+            __update_label();
+        }
+        function put(num,opt){
+            if(num!=null){
+                _eval_string.splice(_input_place,0,num);
+                _input_place++;
+            }else{
+                switch(opt){
+                    case 0:{
+                        _eval_string.splice(_input_place-1,1);
+                        break;
+                    }
+                    case 1:{
+                        _eval_string = [];
+                        _input_place = 0;
+                        break;
+                    }
+                }
+            }
+            __update_label();
+        }
+        function __update_label(force){
+            if(force){
+                _tx.textContent = force;
+            }else{
+                let _tmp_string = Array.from(_eval_string);
+                _tmp_string.splice(_input_place,0,"|");
+                _tx.textContent = _tmp_string.join("");
+            }
+        }
+        function __eval(){
+            let _result = eval(_eval_string.join(""));
+            _eval_string = [_result];
+            _input_place = 1;
+            __update_label();
+            
+        }
+        __toggle();
+        const _PAL = new MPaletteProcesser(MataPalette);
+        _PAL.setPaletteFrom("primary","GREEN",500);
+    </script>
+</body>
+</html>
